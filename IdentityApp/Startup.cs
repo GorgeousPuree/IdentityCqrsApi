@@ -14,7 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -96,6 +99,20 @@ namespace IdentityApp
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.AddCors();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Identity CQRS API",
+                    Description = "A simple Asp.Net Core web API which uses CQRS MediatR pattern to handle requests " +
+                                  "and Identity to communicate with database. Used jwt authentication."
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -128,6 +145,12 @@ namespace IdentityApp
             app.UseMiddleware<HttpAuthMiddleware>(); // it is crucial to add this middleware before app.UseAuthentication()
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity CQRS app");
+            });
 
             app.UseEndpoints(endpoints =>
             {
