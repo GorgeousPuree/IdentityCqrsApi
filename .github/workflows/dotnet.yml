@@ -15,7 +15,7 @@ jobs:
       env: 
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         HEROKU_USERNAME: ${{ secrets.HEROKU_USERNAME }} 
-        APP_NAME: ${{ 'identity-cqrs-app' }}
+        APP_NAME: ${{ secrets.APP_NAME }}
       run: |
         cd ./
         docker login --username=$HEROKU_USERNAME --password=$HEROKU_API_KEY registry.heroku.com
