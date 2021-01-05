@@ -1,5 +1,5 @@
 # Identity CQRS app
-#### Add this variables to your `appsettings.json` or `secrets.json`:
+#### Add this variables to your `appsettings.json` or `secrets.json` to start server locally:
 
 ```
 {
@@ -14,3 +14,4 @@
   } 
 }
 ```
+https://identity-cqrs-app.herokuapp.com/swagger/index.html
