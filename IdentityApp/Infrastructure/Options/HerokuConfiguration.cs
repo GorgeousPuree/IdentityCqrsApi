@@ -7,10 +7,6 @@ namespace IdentityApp.Infrastructure.Options
         public static string GetHerokuConnectionString()
         {
             string connectionUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            string issuer = Environment.GetEnvironmentVariable("Issuer");
-            string audience = Environment.GetEnvironmentVariable("Audience");
-            string key = Environment.GetEnvironmentVariable("Key");
-            int lifetime = int.Parse(Environment.GetEnvironmentVariable("Lifetime"));
 
             var databaseUri = new Uri(connectionUrl);
 
