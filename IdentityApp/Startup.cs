@@ -25,16 +25,22 @@ namespace IdentityApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            CurrentEnvironment = env;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment CurrentEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionString = CurrentEnvironment.IsDevelopment()
+                ? Configuration.GetConnectionString("DefaultConnection")
+                : HerokuConfiguration.GetHerokuConnectionString();
+
             services.AddControllers();
 
             var authOptions = new AuthOptions();
@@ -81,7 +87,7 @@ namespace IdentityApp
                 });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                { options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")); });
+                { options.UseNpgsql(connectionString); });
 
             services.AddIdentityCore<IdentityUser>(options =>
                 {
@@ -116,9 +122,9 @@ namespace IdentityApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (CurrentEnvironment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
