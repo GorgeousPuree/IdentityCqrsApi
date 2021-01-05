@@ -52,7 +52,7 @@ namespace IdentityApp.Controllers
         /// <summary>
         /// Logins a user with given credentials.
         /// </summary>
-        /// <response code="200">Successfully logins user and return HttpOnly cookie with jwt set in it.</response>
+        /// <response code="200">Successfully logins a user and returns HttpOnly cookie with jwt set in it.</response>
         /// <response code="400">If invalid model is passed.</response>      
         /// <response code="500">If server error occurs.</response>   
         [HttpPost]
