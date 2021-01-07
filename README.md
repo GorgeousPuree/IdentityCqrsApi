@@ -6,7 +6,7 @@
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost; Port=5432; Database=identity_app; Username=postgres; Password=12345;"
   },
-  "AuthOptions": {
+  "JwtOptions": {
     "Issuer": "IdentityApp",
     "Audience": "None",
     "Key": "secret_secret_secret_secret_secret_secret_secret_secret_secret_secret_secret_secret_secret_secret",
