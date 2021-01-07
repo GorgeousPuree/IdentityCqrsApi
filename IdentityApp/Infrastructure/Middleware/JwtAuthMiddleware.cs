@@ -6,14 +6,14 @@ namespace IdentityApp.Infrastructure.Middleware
     /// <summary>
     /// After successful login the jwt is passed to the client via httpOnly cookie, so there is no way for
     /// the client to send the jwt back to the server when making authorized requests.
-    /// HttpAuthMiddleware is solving this problem, pulling out the jwt from httpOnly cookie and setting Authorization header.
+    /// JwtAuthMiddleware is solving this problem, pulling out the jwt from httpOnly cookie and setting Authorization header.
     /// With this approach we are secured from cookie compromising (httpOnly cookies are not available via javascript) and able to use jwt authentication.
     /// </summary>
-    public class HttpAuthMiddleware
+    public class JwtAuthMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public HttpAuthMiddleware(RequestDelegate next)
+        public JwtAuthMiddleware(RequestDelegate next)
         {
             _next = next;
         }

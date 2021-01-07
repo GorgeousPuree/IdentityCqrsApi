@@ -152,7 +152,7 @@ namespace IdentityApp
 
             app.UseRouting();
 
-            app.UseMiddleware<HttpAuthMiddleware>(); // it is crucial to add this middleware before app.UseAuthentication()
+            app.UseMiddleware<JwtAuthMiddleware>(); // it is crucial to add this middleware before app.UseAuthentication()
             app.UseAuthentication();
             app.UseAuthorization();
 
