@@ -8,9 +8,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityApp.CQRS.Commands
+namespace IdentityApp.CQRS.Commands.Account
 {
-    public class CreateUserCommand : IRequest<OperationResult>
+    public class CreateUserCommand : IRequest<OperationDataResult<bool>>
     {
         [Required(ErrorMessage = "What is your username?")]
         [MaxLength(32, ErrorMessage = "Must be 32 characters or less!")]
@@ -23,7 +23,7 @@ namespace IdentityApp.CQRS.Commands
         public string Password { get; set; }
     }
 
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, OperationResult>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, OperationDataResult<bool>>
     {
         private readonly UserManager<IdentityUser> _userManager;
 
@@ -31,7 +31,7 @@ namespace IdentityApp.CQRS.Commands
         {
             _userManager = userManager;
         }
-        public async Task<OperationResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<OperationDataResult<bool>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -40,14 +40,16 @@ namespace IdentityApp.CQRS.Commands
 
                 if (!identityResult.Succeeded)
                 {
-                    return new OperationResult(true, identityResult.Errors.Select(error => error.Description));
+                    //return new OperationResult(true, identityResult.Errors.Select(error => error.Description));
+                    return new OperationDataResult<bool>(true, identityResult.Errors.Select(error => error.Description), false);
                 }
 
-                return new OperationResult(true);
+                return new OperationDataResult<bool>(true, true);
             }
             catch (Exception e)
             {
-                return new OperationResult(false, new List<string> { e.Message });
+                //return new OperationResult(false, new List<string> { e.Message });
+                return new OperationDataResult<bool>(false, new List<string> { e.Message });
             }
         }
     }

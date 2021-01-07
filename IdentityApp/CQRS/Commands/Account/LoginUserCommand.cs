@@ -1,4 +1,5 @@
 ﻿using IdentityApp.Abstractions;
+using IdentityApp.CQRS.Commands.CommandResponses;
 using IdentityApp.Infrastructure.Helpers.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -8,9 +9,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityApp.CQRS.Commands
+namespace IdentityApp.CQRS.Commands.Account
 {
-    public class LoginUserCommand : IRequest<OperationDataResult<string>>
+    public class LoginUserCommand : IRequest<OperationDataResult<LoginUserCommandResponse>>
     {
         [Required(ErrorMessage = "What is your username?")]
         [MaxLength(32, ErrorMessage = "Must be 32 characters or less!")]
@@ -23,7 +24,7 @@ namespace IdentityApp.CQRS.Commands
         public string Password { get; set; }
     }
 
-    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, OperationDataResult<string>>
+    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, OperationDataResult<LoginUserCommandResponse>>
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IJwtGenerator _jwtGenerator;
@@ -33,7 +34,7 @@ namespace IdentityApp.CQRS.Commands
             _userManager = userManager;
             _jwtGenerator = jwtGenerator;
         }
-        public async Task<OperationDataResult<string>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<OperationDataResult<LoginUserCommandResponse>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -44,15 +45,17 @@ namespace IdentityApp.CQRS.Commands
 
                 if (!identityResult)
                 {
-                    return new OperationDataResult<string>(true, new List<string> { "Incorrect credentials." });
+                    return new OperationDataResult<LoginUserCommandResponse>(true, new List<string> { "Incorrect credentials." });
                 }
 
                 var jwt = _jwtGenerator.GenerateJwt();
-                return new OperationDataResult<string>(true, jwt);
+                return new OperationDataResult<LoginUserCommandResponse>(
+                    true,
+                    new LoginUserCommandResponse(jwt));
             }
             catch (Exception e)
             {
-                return new OperationDataResult<string>(false, new List<string> { e.Message });
+                return new OperationDataResult<LoginUserCommandResponse>(false, new List<string> { e.Message });
             }
         }
     }

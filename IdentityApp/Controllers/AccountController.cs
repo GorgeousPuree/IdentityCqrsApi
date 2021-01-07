@@ -1,4 +1,6 @@
-﻿using IdentityApp.CQRS.Commands;
+﻿using IdentityApp.CQRS.Commands.Account;
+using IdentityApp.CQRS.Queries.Account;
+using IdentityApp.Infrastructure.Helpers.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +9,7 @@ using System.Threading.Tasks;
 namespace IdentityApp.Controllers
 {
     [ApiController]
+    [Produces(typeof(OperationDataResult<bool>))]
     public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,14 +22,15 @@ namespace IdentityApp.Controllers
         /// <summary>
         /// Creates a user with given credentials.
         /// </summary>
-        /// <response code="200">Returns messages stating why the user could not be created.</response>
-        /// <response code="201">Creates a user.</response>
+        /// <response code="200">Returns if service successfully handles the request.
+        /// 'model' property shows whether the account was created. If false, 'messages' property will be filled with explanatory data.</response>
+        /// <response code="201">Returns if service successfully handles the request and creates a user.</response>
         /// <response code="400">If invalid model is passed.</response>      
         /// <response code="500">If server error occurs.</response>      
         [HttpPost]
         [Route("api/account/registration")]
         [Produces("application/json")]
-        public async Task<IActionResult> Register(CreateUserCommand createUserCommand)
+        public async Task<IActionResult> Register([FromBody] CreateUserCommand createUserCommand)
         {
             var result = await _mediator.Send(createUserCommand);
 
@@ -35,7 +39,7 @@ namespace IdentityApp.Controllers
                 return StatusCode(500, result);
             }
 
-            if (result.Messages[0] != "Succeeded")
+            if (!result.Model)
             {
                 return Ok(result);
             }
@@ -46,13 +50,15 @@ namespace IdentityApp.Controllers
         /// <summary>
         /// Logins a user with given credentials.
         /// </summary>
-        /// <response code="200">Successfully logins a user and returns HttpOnly cookie with jwt set in it.</response>
+        /// <response code="200">Returns if service successfully handles the request.
+        /// 'model' property shows whether the user has logged in or not.
+        /// If 'model' equals to true, server returns HttpOnly cookie with jwt set in it.</response>
         /// <response code="400">If invalid model is passed.</response>      
         /// <response code="500">If server error occurs.</response>   
         [HttpPost]
         [Route("api/account/login")]
         [Produces("application/json")]
-        public async Task<IActionResult> Login(LoginUserCommand loginUserCommand)
+        public async Task<IActionResult> Login([FromBody] LoginUserCommand loginUserCommand)
         {
             var result = await _mediator.Send(loginUserCommand);
 
@@ -61,14 +67,31 @@ namespace IdentityApp.Controllers
                 return StatusCode(500, result);
             }
 
-            if (result.Messages[0] != "Succeeded")
+            if (!result.Model.AccountExists)
             {
-                return Ok(result);
+                return Ok(new OperationDataResult<bool>(true, false));
             }
 
-            HttpContext.Response.Cookies.Append(".AspNetCore.Application.Id", result.Model); // Nonsense name for security purposes. 
+            HttpContext.Response.Cookies.Append(".AspNetCore.Application.Id", result.Model.Jwt); // Nonsense name for security purposes. 
 
-            return Ok();
+            return Ok(new OperationDataResult<bool>(true, true));
+        }
+
+        /// <summary>
+        /// Checks whether the username was already taken or not.
+        /// </summary>
+        /// <response code="200">Returns if service successfully handles the request.
+        /// 'model' property shows whether the username was already taken or not.</response>
+        /// <response code="400">If invalid model is passed.</response>      
+        /// <response code="500">If server error occurs.</response>   
+        [HttpGet]
+        [Route("api/account/username-taken")]
+        [Produces("application/json")]
+        public async Task<IActionResult> IsUsernameTaken([FromQuery] IsUsernameTakenQuery isUsernameTakenQuery)
+        {
+            var result = await _mediator.Send(isUsernameTakenQuery);
+
+            return !result.Succeeded ? StatusCode(500, result) : Ok(result);
         }
     }
 }

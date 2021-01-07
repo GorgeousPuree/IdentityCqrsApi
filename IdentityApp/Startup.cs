@@ -1,6 +1,6 @@
 using IdentityApp.Abstractions;
 using IdentityApp.Infrastructure.Database;
-using IdentityApp.Infrastructure.Helpers.Responses;
+using IdentityApp.Infrastructure.Helpers.Extensions;
 using IdentityApp.Infrastructure.Middleware;
 using IdentityApp.Infrastructure.Options;
 using IdentityApp.Services;
@@ -19,11 +19,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using IdentityApp.Infrastructure.Helpers.Extensions;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace IdentityApp
 {
@@ -159,6 +157,10 @@ namespace IdentityApp
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
+                c.ConfigObject = new ConfigObject
+                {
+                    ShowCommonExtensions = true
+                };
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity CQRS app");
             });
 

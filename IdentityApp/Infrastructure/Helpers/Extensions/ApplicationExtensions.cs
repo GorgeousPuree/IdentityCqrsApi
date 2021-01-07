@@ -1,9 +1,7 @@
-﻿using System;
+﻿using IdentityApp.Infrastructure.Helpers.Responses;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using IdentityApp.Infrastructure.Helpers.Responses;
-using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityApp.Infrastructure.Helpers.Extensions
 {
