@@ -12,11 +12,14 @@ namespace IdentityApp.CQRS.Commands
 {
     public class CreateUserCommand : IRequest<OperationResult>
     {
-        [Required]
+        [Required(ErrorMessage = "What is your username?")]
+        [MaxLength(32, ErrorMessage = "Must be 32 characters or less!")]
+        [MinLength(3, ErrorMessage = "Must be 3 characters or more!")]
         public string Username { get; set; }
 
-        [Required]
-        [MinLength(6)]
+        [Required(ErrorMessage = "What is your password?")]
+        [MaxLength(32, ErrorMessage = "Must be 32 characters or less!")]
+        [MinLength(6, ErrorMessage = "Must be 6 characters or more!")]
         public string Password { get; set; }
     }
 
