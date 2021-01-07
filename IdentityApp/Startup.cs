@@ -1,7 +1,9 @@
+using IdentityApp.Abstractions;
 using IdentityApp.Infrastructure.Database;
 using IdentityApp.Infrastructure.Helpers.Responses;
 using IdentityApp.Infrastructure.Middleware;
 using IdentityApp.Infrastructure.Options;
+using IdentityApp.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
@@ -20,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using IdentityApp.Infrastructure.Helpers.Extensions;
 
 namespace IdentityApp
 {
@@ -43,27 +47,17 @@ namespace IdentityApp
 
             services.AddControllers();
 
-            var authOptions = new AuthOptions();
-            var configSection = Configuration.GetSection("AuthOptions");
+            var jwtOptions = new JwtOptions();
+            var configSection = Configuration.GetSection("JwtOptions");
 
-            configSection.Bind(authOptions);
+            configSection.Bind(jwtOptions);
 
-            services.Configure<AuthOptions>(configSection);
+            services.Configure<JwtOptions>(configSection);
 
             // Custom BadRequest response on ModelState validation
             services.Configure<ApiBehaviorOptions>(o =>
             {
-                o.InvalidModelStateResponseFactory = actionContext =>
-                {
-                    OperationResult result = new OperationResult(false, new List<string>());
-
-                    foreach (var modelState in actionContext.ModelState)
-                    {
-                        result.Messages = modelState.Value.Errors.Select(error => error.ErrorMessage).ToList();
-                    }
-
-                    return new BadRequestObjectResult(result);
-                };
+                o.CustomInvalidModelStateResponse();
             });
 
             services.AddAuthentication(options =>
@@ -77,11 +71,11 @@ namespace IdentityApp
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = authOptions.Issuer,
+                        ValidIssuer = jwtOptions.Issuer,
                         ValidateAudience = false,
                         //ValidAudience = authOptions.Audience,
                         ValidateLifetime = true,
-                        IssuerSigningKey = authOptions.GetSymmetricSecurityKey(),
+                        IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey(),
                         ValidateIssuerSigningKey = true,
                     };
                 });
@@ -101,6 +95,8 @@ namespace IdentityApp
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddScoped<IJwtGenerator, JwtGenerator>();
 
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
@@ -122,7 +118,7 @@ namespace IdentityApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IOptionsMonitor<JwtOptions> jwtOptionsMonitor)
         {
             if (CurrentEnvironment.IsDevelopment())
             {
@@ -141,6 +137,14 @@ namespace IdentityApp
             {
                 MinimumSameSitePolicy = SameSiteMode.Strict,
                 Secure = CookieSecurePolicy.Always,
+                OnAppendCookie = (context =>
+                {
+                    if (context.CookieName == ".AspNetCore.Application.Id")
+                    {
+                        context.CookieOptions.Expires = new DateTimeOffset(DateTime.Now.AddMinutes(jwtOptionsMonitor.CurrentValue.Lifetime));
+                        context.CookieOptions.HttpOnly = true;
+                    }
+                })
                 //HttpOnly = HttpOnlyPolicy.Always,
             });
 

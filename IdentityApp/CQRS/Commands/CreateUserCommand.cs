@@ -4,40 +4,40 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityApp.Infrastructure.CQRS.Commands
+namespace IdentityApp.CQRS.Commands
 {
-    public class LoginUserCommand : IRequest<OperationResult>
+    public class CreateUserCommand : IRequest<OperationResult>
     {
         [Required]
         public string Username { get; set; }
 
         [Required]
+        [MinLength(6)]
         public string Password { get; set; }
     }
 
-    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, OperationResult>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, OperationResult>
     {
         private readonly UserManager<IdentityUser> _userManager;
 
-        public LoginUserCommandHandler(UserManager<IdentityUser> userManager)
+        public CreateUserCommandHandler(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
         }
-        public async Task<OperationResult> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var foundIdentity = await _userManager.FindByNameAsync(request.Username);
-
                 var identityResult =
-                    await _userManager.CheckPasswordAsync(foundIdentity, request.Password);
+                    await _userManager.CreateAsync(new IdentityUser(request.Username), request.Password);
 
-                if (!identityResult)
+                if (!identityResult.Succeeded)
                 {
-                    return new OperationResult(true, new List<string> { "Incorrect credentials." });
+                    return new OperationResult(true, identityResult.Errors.Select(error => error.Description));
                 }
 
                 return new OperationResult(true);
