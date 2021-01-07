@@ -1,11 +1,7 @@
-﻿using IdentityApp.Infrastructure.CQRS.Commands;
-using IdentityApp.Infrastructure.Helpers.Auth;
-using IdentityApp.Infrastructure.Options;
+﻿using IdentityApp.CQRS.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System;
 using System.Threading.Tasks;
 
 namespace IdentityApp.Controllers
@@ -14,12 +10,10 @@ namespace IdentityApp.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly AuthOptions _authOptions;
 
-        public AccountController(IMediator mediator, IOptionsMonitor<AuthOptions> optionsMonitor)
+        public AccountController(IMediator mediator)
         {
             _mediator = mediator;
-            _authOptions = optionsMonitor.CurrentValue;
         }
 
         /// <summary>
@@ -72,18 +66,9 @@ namespace IdentityApp.Controllers
                 return Ok(result);
             }
 
-            var encodedJwt = JwtGenerator.Generate(_authOptions);
+            HttpContext.Response.Cookies.Append(".AspNetCore.Application.Id", result.Model); // Nonsense name for security purposes. 
 
-            HttpContext.Response.Cookies.Append(
-                ".AspNetCore.Application.Id", // nonsense name for securing purposes.
-                encodedJwt,
-                new CookieOptions
-                {
-                    MaxAge = TimeSpan.FromMinutes(_authOptions.Lifetime),
-                    HttpOnly = true,
-                });
-
-            return Ok(result);
+            return Ok();
         }
     }
 }
