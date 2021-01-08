@@ -1,5 +1,5 @@
 # Identity CQRS app
-#### Add this variables to your `appsettings.json` or `secrets.json` to start server locally:
+#### Add such variables to your `appsettings.json` or `secrets.json` to start server locally:
 
 ```
 {
