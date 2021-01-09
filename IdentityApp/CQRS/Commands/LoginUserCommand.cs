@@ -1,5 +1,5 @@
 ﻿using IdentityApp.Abstractions;
-using IdentityApp.CQRS.Commands.CommandResponses;
+using IdentityApp.CQRS.Commands.CommandResults;
 using IdentityApp.Infrastructure.Helpers.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -9,9 +9,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityApp.CQRS.Commands.Account
+namespace IdentityApp.CQRS.Commands
 {
-    public class LoginUserCommand : IRequest<OperationDataResult<LoginUserCommandResponse>>
+    public class LoginUserCommand : IRequest<(OperationDataResult<LoginUserCommandResult>, string)>
     {
         [Required(ErrorMessage = "What is your username?")]
         [MaxLength(32, ErrorMessage = "Must be 32 characters or less!")]
@@ -24,7 +24,7 @@ namespace IdentityApp.CQRS.Commands.Account
         public string Password { get; set; }
     }
 
-    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, OperationDataResult<LoginUserCommandResponse>>
+    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, (OperationDataResult<LoginUserCommandResult>, string)>
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IJwtGenerator _jwtGenerator;
@@ -34,7 +34,7 @@ namespace IdentityApp.CQRS.Commands.Account
             _userManager = userManager;
             _jwtGenerator = jwtGenerator;
         }
-        public async Task<OperationDataResult<LoginUserCommandResponse>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<(OperationDataResult<LoginUserCommandResult>, string)> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -45,17 +45,15 @@ namespace IdentityApp.CQRS.Commands.Account
 
                 if (!identityResult)
                 {
-                    return new OperationDataResult<LoginUserCommandResponse>(true, new List<string> { "Incorrect credentials." });
+                    return (new OperationDataResult<LoginUserCommandResult>(true, new List<string> { "Incorrect credentials." }), string.Empty);
                 }
 
                 var jwt = _jwtGenerator.GenerateJwt();
-                return new OperationDataResult<LoginUserCommandResponse>(
-                    true,
-                    new LoginUserCommandResponse(jwt));
+                return (new OperationDataResult<LoginUserCommandResult>(true, new LoginUserCommandResult(true)), jwt);
             }
             catch (Exception e)
             {
-                return new OperationDataResult<LoginUserCommandResponse>(false, new List<string> { e.Message });
+                return (new OperationDataResult<LoginUserCommandResult>(false, new List<string> { e.Message }), string.Empty);
             }
         }
     }

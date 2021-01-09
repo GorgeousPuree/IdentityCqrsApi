@@ -1,4 +1,5 @@
-﻿using IdentityApp.Infrastructure.Helpers.Responses;
+﻿using IdentityApp.CQRS.Commands.CommandResults;
+using IdentityApp.Infrastructure.Helpers.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -8,9 +9,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IdentityApp.CQRS.Commands.Account
+namespace IdentityApp.CQRS.Commands
 {
-    public class CreateUserCommand : IRequest<OperationDataResult<bool>>
+    public class CreateUserCommand : IRequest<OperationDataResult<CreateUserCommandResult>>
     {
         [Required(ErrorMessage = "What is your username?")]
         [MaxLength(32, ErrorMessage = "Must be 32 characters or less!")]
@@ -23,7 +24,7 @@ namespace IdentityApp.CQRS.Commands.Account
         public string Password { get; set; }
     }
 
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, OperationDataResult<bool>>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, OperationDataResult<CreateUserCommandResult>>
     {
         private readonly UserManager<IdentityUser> _userManager;
 
@@ -31,7 +32,7 @@ namespace IdentityApp.CQRS.Commands.Account
         {
             _userManager = userManager;
         }
-        public async Task<OperationDataResult<bool>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<OperationDataResult<CreateUserCommandResult>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -40,16 +41,17 @@ namespace IdentityApp.CQRS.Commands.Account
 
                 if (!identityResult.Succeeded)
                 {
-                    //return new OperationResult(true, identityResult.Errors.Select(error => error.Description));
-                    return new OperationDataResult<bool>(true, identityResult.Errors.Select(error => error.Description), false);
+                    return new OperationDataResult<CreateUserCommandResult>(
+                        true,
+                        identityResult.Errors.Select(error => error.Description),
+                        new CreateUserCommandResult(true));
                 }
 
-                return new OperationDataResult<bool>(true, true);
+                return new OperationDataResult<CreateUserCommandResult>(true, new CreateUserCommandResult(true));
             }
             catch (Exception e)
             {
-                //return new OperationResult(false, new List<string> { e.Message });
-                return new OperationDataResult<bool>(false, new List<string> { e.Message });
+                return new OperationDataResult<CreateUserCommandResult>(false, new List<string> { e.Message });
             }
         }
     }
