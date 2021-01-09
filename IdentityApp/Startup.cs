@@ -18,10 +18,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.IO;
 using System.Reflection;
-using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Text.Json.Serialization;
 
 namespace IdentityApp
 {
@@ -43,7 +44,9 @@ namespace IdentityApp
                 ? Configuration.GetConnectionString("DefaultConnection")
                 : HerokuConfiguration.GetHerokuConnectionString();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             var jwtOptions = new JwtOptions();
             var configSection = Configuration.GetSection("JwtOptions");
@@ -137,6 +140,7 @@ namespace IdentityApp
                 Secure = CookieSecurePolicy.Always,
                 OnAppendCookie = (context =>
                 {
+                    // Authentication cookie
                     if (context.CookieName == ".AspNetCore.Application.Id")
                     {
                         context.CookieOptions.Expires = new DateTimeOffset(DateTime.Now.AddMinutes(jwtOptionsMonitor.CurrentValue.Lifetime));
