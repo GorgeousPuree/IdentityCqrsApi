@@ -16,23 +16,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityApp.CQRS.Queries
 {
-    public class ExportedTransactionsQuery : IRequest<OperationDataResult<ExportedTransactionsQueryResult>>
+    public class ExportTransactionsQuery : IRequest<OperationDataResult<ExportedTransactionsQueryResult>>
     {
         public List<TransactionStatus> TransactionStatuses { get; set; } = new List<TransactionStatus>();
         public List<TransactionType> TransactionTypes { get; set; } = new List<TransactionType>();
     }
 
-    public class ExportedTransactionsQueryHandler : IRequestHandler<ExportedTransactionsQuery,
+    public class ExportTransactionsQueryHandler : IRequestHandler<ExportTransactionsQuery,
         OperationDataResult<ExportedTransactionsQueryResult>>
     {
         private readonly ApplicationDbContext _applicationDbContext;
 
-        public ExportedTransactionsQueryHandler(ApplicationDbContext applicationDbContext)
+        public ExportTransactionsQueryHandler(ApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<OperationDataResult<ExportedTransactionsQueryResult>> Handle(ExportedTransactionsQuery query, CancellationToken cancellationToken)
+        public async Task<OperationDataResult<ExportedTransactionsQueryResult>> Handle(ExportTransactionsQuery query, CancellationToken cancellationToken)
         {
             try
             {

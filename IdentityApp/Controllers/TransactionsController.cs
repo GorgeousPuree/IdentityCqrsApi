@@ -40,7 +40,8 @@ namespace IdentityApp.Controllers
         /// <response code="500">If server error occurs.</response>  
         [HttpGet]
         [Route("api/transactions/export")]
-        public async Task<IActionResult> GetExportedTransactions([FromQuery] ExportedTransactionsQuery transactionPageQuery)
+        [Produces("text/csv")]
+        public async Task<IActionResult> GetExportedTransactions([FromQuery] ExportTransactionsQuery transactionPageQuery)
         {
             var result = await _mediator.Send(transactionPageQuery);
 
