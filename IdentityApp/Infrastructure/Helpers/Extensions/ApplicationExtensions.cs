@@ -15,7 +15,7 @@ namespace IdentityApp.Infrastructure.Helpers.Extensions
 
                 foreach (var modelState in actionContext.ModelState)
                 {
-                    result.Messages = modelState.Value.Errors.Select(error => error.ErrorMessage).ToList();
+                    result.Messages.AddRange(modelState.Value.Errors.Select(error => error.ErrorMessage).ToList());
                 }
 
                 return new BadRequestObjectResult(result);
