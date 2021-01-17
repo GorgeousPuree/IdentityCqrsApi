@@ -1,12 +1,12 @@
-﻿using IdentityApp.Infrastructure.Helpers.Responses;
+﻿using IdentityApp.CQRS.Commands;
+using IdentityApp.CQRS.Commands.CommandResults;
+using IdentityApp.CQRS.Queries;
+using IdentityApp.CQRS.Queries.QueryResults;
+using IdentityApp.Infrastructure.Helpers.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using IdentityApp.CQRS.Commands;
-using IdentityApp.CQRS.Commands.CommandResults;
-using IdentityApp.CQRS.Queries;
-using IdentityApp.CQRS.Queries.QueryResults;
 
 namespace IdentityApp.Controllers
 {

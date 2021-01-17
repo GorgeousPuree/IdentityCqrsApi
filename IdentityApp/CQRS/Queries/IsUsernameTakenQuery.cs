@@ -1,12 +1,12 @@
-﻿using System;
+﻿using IdentityApp.CQRS.Queries.QueryResults;
+using IdentityApp.Infrastructure.Helpers.Responses;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityApp.CQRS.Queries.QueryResults;
-using IdentityApp.Infrastructure.Helpers.Responses;
-using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace IdentityApp.CQRS.Queries
 {

@@ -1,24 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CsvHelper;
+﻿using CsvHelper;
 using IdentityApp.CQRS.Queries.QueryResults;
 using IdentityApp.Infrastructure.Database;
 using IdentityApp.Infrastructure.Database.Enums;
 using IdentityApp.Infrastructure.Helpers.Responses;
 using IdentityApp.Infrastructure.Models;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityApp.CQRS.Queries
 {
     public class ExportTransactionsQuery : IRequest<OperationDataResult<ExportedTransactionsQueryResult>>
     {
+        [BindProperty(Name = "statuses")]
         public List<TransactionStatus> TransactionStatuses { get; set; } = new List<TransactionStatus>();
+
+        [BindProperty(Name = "types")]
         public List<TransactionType> TransactionTypes { get; set; } = new List<TransactionType>();
     }
 
@@ -36,7 +40,7 @@ namespace IdentityApp.CQRS.Queries
         {
             try
             {
-                var transactionsQuery = _applicationDbContext.Transactions
+                var transactionsQuery = _applicationDbContext.Transactions.AsQueryable() // ambiguous invocation of System.Linq.Queryable and System.Linq.AsyncEnumerable 
                     .OrderBy(transaction => transaction.Id)
                     .AsQueryable();
 
@@ -55,7 +59,7 @@ namespace IdentityApp.CQRS.Queries
                 }
 
                 var transactions = await transactionsQuery
-                    .Select(transaction => new TransactionCsvModel
+                    .Select(transaction => new TransactionModel
                     {
                         Id = transaction.Id,
                         Amount = transaction.Amount,
@@ -73,11 +77,10 @@ namespace IdentityApp.CQRS.Queries
                 await using var writer = new StreamWriter(ms);
                 await using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
                 {
-                    var classMap = csv.Configuration.AutoMap<TransactionCsvModel>();
-                    csv.Configuration.RegisterClassMap(classMap);
                     csv.Configuration.Delimiter = ",";
+                    csv.Configuration.RegisterClassMap<TransactionCsvMap>();
 
-                    csv.WriteHeader<TransactionCsvModel>();
+                    csv.WriteHeader<TransactionModel>();
                     await csv.NextRecordAsync();
                     await csv.WriteRecordsAsync(transactions);
                 }

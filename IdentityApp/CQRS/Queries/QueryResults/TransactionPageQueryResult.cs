@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using IdentityApp.Infrastructure.Models;
+﻿using IdentityApp.Infrastructure.Models;
+using System.Collections.Generic;
 
 namespace IdentityApp.CQRS.Queries.QueryResults
 {

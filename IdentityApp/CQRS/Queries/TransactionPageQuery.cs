@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using IdentityApp.CQRS.Queries.QueryResults;
+﻿using IdentityApp.CQRS.Queries.QueryResults;
 using IdentityApp.Infrastructure.Database;
 using IdentityApp.Infrastructure.Database.Enums;
 using IdentityApp.Infrastructure.Helpers.Responses;
 using IdentityApp.Infrastructure.Models;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IdentityApp.CQRS.Queries
 {
@@ -18,13 +19,17 @@ namespace IdentityApp.CQRS.Queries
     {
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "PageNumber has to be greater than {1}")]
+        [BindProperty(Name = "page_number")]
         public int PageNumber { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "NumberOfItemsPerPage has to be greater or equal to {1}")]
+        [BindProperty(Name = "number_of_items_per_page")]
         public int NumberOfItemsPerPage { get; set; } = 10;
 
+        [BindProperty(Name = "statuses")]
         public List<TransactionStatus> TransactionStatuses { get; set; } = new List<TransactionStatus>();
 
+        [BindProperty(Name = "types")]
         public List<TransactionType> TransactionTypes { get; set; } = new List<TransactionType>();
     }
 
@@ -43,7 +48,7 @@ namespace IdentityApp.CQRS.Queries
         {
             try
             {
-                var transactionsQuery = _applicationDbContext.Transactions
+                var transactionsQuery = _applicationDbContext.Transactions.AsQueryable() // ambiguous invocation of System.Linq.Queryable and System.Linq.AsyncEnumerable
                     .OrderBy(transaction => transaction.Id)
                     .AsQueryable();
 

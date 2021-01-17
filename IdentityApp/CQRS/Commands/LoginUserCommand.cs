@@ -45,7 +45,11 @@ namespace IdentityApp.CQRS.Commands
 
                 if (!identityResult)
                 {
-                    return (new OperationDataResult<LoginUserCommandResult>(true, new List<string> { "Incorrect credentials." }), string.Empty);
+                    return (new OperationDataResult<LoginUserCommandResult>(
+                        true, 
+                        new List<string> { "Incorrect credentials." }, 
+                        new LoginUserCommandResult(false)), 
+                        string.Empty);
                 }
 
                 var jwt = _jwtGenerator.GenerateJwt();
