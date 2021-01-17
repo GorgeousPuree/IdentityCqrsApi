@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityApp", "IdentityApp\IdentityApp.csproj", "{3E212F43-EB63-46E7-A2B4-0F8038794ED1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityApp", "IdentityApp\IdentityApp.csproj", "{3E212F43-EB63-46E7-A2B4-0F8038794ED1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityApp.Tests", "IdentityApp.Tests\IdentityApp.Tests.csproj", "{4A9B83C9-9A22-407E-AF8D-0DD338210399}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3E212F43-EB63-46E7-A2B4-0F8038794ED1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E212F43-EB63-46E7-A2B4-0F8038794ED1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E212F43-EB63-46E7-A2B4-0F8038794ED1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A9B83C9-9A22-407E-AF8D-0DD338210399}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A9B83C9-9A22-407E-AF8D-0DD338210399}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A9B83C9-9A22-407E-AF8D-0DD338210399}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A9B83C9-9A22-407E-AF8D-0DD338210399}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
