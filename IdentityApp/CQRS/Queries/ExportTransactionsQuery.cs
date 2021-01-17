@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace IdentityApp.CQRS.Queries
 {
-    public class ExportTransactionsQuery : IRequest<OperationDataResult<ExportedTransactionsQueryResult>>
+    public class ExportTransactionsQuery : IRequest<OperationDataResult<ExportTransactionsQueryResult>>
     {
         [BindProperty(Name = "statuses")]
         public List<TransactionStatus> TransactionStatuses { get; set; } = new List<TransactionStatus>();
@@ -27,7 +27,7 @@ namespace IdentityApp.CQRS.Queries
     }
 
     public class ExportTransactionsQueryHandler : IRequestHandler<ExportTransactionsQuery,
-        OperationDataResult<ExportedTransactionsQueryResult>>
+        OperationDataResult<ExportTransactionsQueryResult>>
     {
         private readonly ApplicationDbContext _applicationDbContext;
 
@@ -36,7 +36,7 @@ namespace IdentityApp.CQRS.Queries
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<OperationDataResult<ExportedTransactionsQueryResult>> Handle(ExportTransactionsQuery query, CancellationToken cancellationToken)
+        public async Task<OperationDataResult<ExportTransactionsQueryResult>> Handle(ExportTransactionsQuery query, CancellationToken cancellationToken)
         {
             try
             {
@@ -84,11 +84,11 @@ namespace IdentityApp.CQRS.Queries
                     await csv.NextRecordAsync();
                     await csv.WriteRecordsAsync(transactions);
                 }
-                return new OperationDataResult<ExportedTransactionsQueryResult>(true, new ExportedTransactionsQueryResult(ms.ToArray()));
+                return new OperationDataResult<ExportTransactionsQueryResult>(true, new ExportTransactionsQueryResult(ms.ToArray()));
             }
             catch (Exception e)
             {
-                return new OperationDataResult<ExportedTransactionsQueryResult>(false, new List<string> { e.Message });
+                return new OperationDataResult<ExportTransactionsQueryResult>(false, new List<string> { e.Message });
             }
         }
     }

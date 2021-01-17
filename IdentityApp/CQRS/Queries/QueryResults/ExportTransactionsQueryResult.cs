@@ -1,10 +1,10 @@
 ﻿namespace IdentityApp.CQRS.Queries.QueryResults
 {
-    public class ExportedTransactionsQueryResult
+    public class ExportTransactionsQueryResult
     {
         public byte[] FileData { get; set; }
 
-        public ExportedTransactionsQueryResult(byte[] fileData)
+        public ExportTransactionsQueryResult(byte[] fileData)
         {
             FileData = fileData;
         }
